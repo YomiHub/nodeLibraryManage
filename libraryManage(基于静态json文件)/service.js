@@ -14,6 +14,16 @@ let maxCode = () => {
   return Math.max.apply(null, code);
 }
 
+//将内存中的数据写入文件之后跳转到首页
+let writeDataToFile = (res) => {
+  fs.writeFile(path.join(__dirname, './data.json'), JSON.stringify(data, null, 4), (err) => {
+    if (err) {
+      res.send('server error');
+    }
+    res.redirect('/');  //返回首页
+  })
+}
+
 //渲染首页
 exports.showIndex = (req, res) => {
   res.render('index', { list: data });  //将数据对象命名为list
@@ -37,15 +47,7 @@ exports.addBook = (req, res) => {
   }
   data.push(addData); //将添加的书放入数组中
 
-  //参数null,4表示格式化json数据，在数据前添加4个空格
-  fs.writeFile(path.join(__dirname, './data.json'), JSON.stringify(data, null, 4), (err) => {
-    if (err) {
-      res.send('server erro');
-    }
-
-    //文件写入成功后跳转到首页
-    res.redirect('/');
-  })
+  writeDataToFile(res);
 }
 
 //根据ID查询到图书信息，并跳转页面
@@ -73,15 +75,7 @@ exports.editBook = (req, res) => {
     }
   })
 
-  //将数据从内存写入文件
-  fs.writeFile(path.join(__dirname, './data.json'), JSON.stringify(data, null, 4), (err) => {
-    if (err) {
-      res.send('server erro');
-    }
-
-    //文件写入成功后跳转到首页
-    res.redirect('/');
-  })
+  writeDataToFile(res);
 }
 
 //根据ID删除图书
@@ -94,10 +88,5 @@ exports.deleteBook = (req, res) => {
     return;
   })
 
-  fs.writeFile(path.join(__dirname, './data.json'), JSON.stringify(data, null, 4), (err) => {
-    if (err) {
-      res.send('server error');
-    }
-    res.redirect('/');  //返回首页
-  })
+  writeDataToFile(res);
 }
